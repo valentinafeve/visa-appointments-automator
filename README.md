@@ -1,2 +1,3 @@
-# automating-visa-appointment
-Automating a Visa appointment setter
+# Visa Appointments Automator
+
+Automatically looks for available dates for appoinments
