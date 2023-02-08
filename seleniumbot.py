@@ -1,10 +1,5 @@
-import os
-import time
-
-import selenium
 import logging
-from abc import ABC, abstractmethod
-from threading import Thread
+import time
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -13,13 +8,12 @@ from selenium.webdriver.firefox.options import Options as FirefoxOptions
 
 EMBASSY_URL = "https://ais.usvisa-info.com/es-co/niv/schedule/38456763/appointment"
 
-MONTHS_RANGE = 80
-
 
 class VisaBot:
-    def __init__(self, email="", password=""):
+    def __init__(self, email="", password="", months_range=2):
         self.email = email
         self.password = password
+        self.months_range = months_range
 
         options = FirefoxOptions()
         options.add_argument("--headless")
@@ -31,7 +25,7 @@ class VisaBot:
 
     def select_a_date_given_calendar(self, calendar_picker):
         tries = 0
-        while tries < MONTHS_RANGE:
+        while tries < self.months_range:
             first_group = calendar_picker.find_element(By.CLASS_NAME, "ui-datepicker-group-first")
             month_name = first_group.find_element(By.CLASS_NAME, "ui-datepicker-month")
             logging.info(f"Looking for dates on {month_name.text}")
@@ -55,7 +49,7 @@ class VisaBot:
                 return True
 
             next_button = calendar_picker.find_element(By.CLASS_NAME, "ui-datepicker-next.ui-corner-all")
-            next_button.click()
+            # next_button.click()
             tries += 2
         return False
 
@@ -110,16 +104,3 @@ class VisaBot:
 
         self.web_driver.close()
         return
-
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)8.8s] %(message)s",
-    handlers=[logging.StreamHandler()],
-)
-
-email = os.environ['USVISA_EMAIL']
-password = os.environ['USVISA_PASSWORD']
-
-visa = VisaBot(email=email, password=password)
-visa.search_for_dates()
